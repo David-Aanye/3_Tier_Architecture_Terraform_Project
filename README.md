@@ -1,4 +1,4 @@
-# 3-TIER APPLICATION ARCHITECTURE PROJECT USING TERRAFORM
+# 3-TIER APPLICATION ARCHITECTURE PROJECT USING TERRAFORM DEPLOYED THROUGH CI/CD
 ...........................................................
 
 3-tier application architecture comprising loosley coupled layers;
