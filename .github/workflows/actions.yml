@@ -1,0 +1,47 @@
+name: 3-Tier Architecture Terraform Infrastructure CI/CD
+ 
+on:
+    push: 
+         branches:
+              - main
+     
+jobs: 
+    deploy:
+       name: Deloy-Terraform-Infrast
+       runs-on: ubuntu-latest
+       
+       steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v2
+
+        - name: Configure Aws credentials
+          uses: aws-actions/configure-aws-credentials@v3
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ca-central-1
+              
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
+        - name: Terraform Init
+          run: terraform init
+          working-directory: ./Terraform_config_files
+        - name: Terraform validate
+          run: terraform validate
+          working-directory: ./Terraform_config_files
+        - name: Terraform Plan
+          run: terraform plan
+          working-directory: ./Terraform_config_files
+        - name: Terraform Apply
+          run: terraform apply -auto-approve
+          working-directory: ./Terraform_config_files
+           
+
+          
+           
+           
+             
+
+          
+               
+    
