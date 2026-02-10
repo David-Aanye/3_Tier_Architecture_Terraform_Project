@@ -10,12 +10,9 @@ That achieves high scalability, availability, manageability and a secured archit
 
 STEPS
 .................................................................
-1. Provison VPC using terraform
--two public subnets across 2 AZs for Web-Tier(achieves high availability)
--two private subnets across 2 AZs for App-Tier (achieves high availability)
--two private subnets across 2 AZs for Database-Tier (achieves high availability)
--two internet gateway, route table and associations for the public subnets(Web-Tier)
--two elastic ips and nat gateway for each AZ with route tables and associations(App-Tier)
+1. Provison VPC, two public subnets across 2 AZs for Web-Tier(achieves high availability), two private subnets across 2 AZs for App-Tier (achieves high availability),
+   two private subnets across 2 AZs for Database-Tier (achieves high availability), two internet gateway, route table and associations for the public subnets(Web-Tier),
+   two elastic ips and nat gateway for each AZ with route tables and associations(App-Tier)
 
 3. S3 Bucket and IAM Role Setup using terraform 
 -Provision S3 bucket and upload application code
