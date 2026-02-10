@@ -11,18 +11,18 @@ That achieves high scalability, availability, manageability and a secured archit
 STEPS
 .................................................................
 1. Provison VPC using terraform
-two public subnets across 2 AZs for Web-Tier(achieves high availability)
-two private subnets across 2 AZs for App-Tier (achieves high availability)
-two private subnets across 2 AZs for Database-Tier (achieves high availability)
-two internet gateway, route table and associations for the public subnets(Web-Tier)
-two elastic ips and nat gateway for each AZ with route tables and associations(App-Tier)
+-two public subnets across 2 AZs for Web-Tier(achieves high availability)
+-two private subnets across 2 AZs for App-Tier (achieves high availability)
+-two private subnets across 2 AZs for Database-Tier (achieves high availability)
+-two internet gateway, route table and associations for the public subnets(Web-Tier)
+-two elastic ips and nat gateway for each AZ with route tables and associations(App-Tier)
 
 3. S3 Bucket and IAM Role Setup using terraform 
-Provision S3 bucket and upload application code
-Create IAM role with SSMManagedInstance and AmazonS3ReadOnlyAccess to access the Applicaction ccode in s3 bucket
+-Provision S3 bucket and upload application code
+-Create IAM role with SSMManagedInstance and AmazonS3ReadOnlyAccess to access the Applicaction ccode in s3 bucket
    
 4. Database-Tier Setup
-Database subnet group and rds instance provisioned, configured and deployed to serve as the backend database
+-Database subnet group and rds instance provisioned, configured and deployed to serve as the backend database
  
 5. Setup App-Tier to Create AMI
 Launch ec2-instance within an App-tier subnet with created IAM role attached
