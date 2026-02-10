@@ -7,10 +7,12 @@ Application-Tier (apptier)
 Database-Tier (dbtier)
 That achieves high scalability, availability, manageability and a secured architecture
 
-
+..........................................................................................................................
 STEPS
-.................................................................
+...........................................................................................................................
+
 A. VPC and networking
+
 1. Provison VPC
 2. two public subnets across 2 AZs for Web-Tier(achieves high availability)
 3. two private subnets across 2 AZs for App-Tier (achieves high availability)
