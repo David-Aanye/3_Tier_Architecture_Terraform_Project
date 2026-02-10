@@ -1,11 +1,13 @@
-# 3-TIER APPLICATION ARCHITECTURE PROJECT USING TERRAFORM DEPLOYED THROUGH CI/CD
+# 3-TIER ARCHITECTURE PROJECT USING TERRAFORM DEPLOYED THROUGH CI/CD
 ...........................................................
 
-3-tier application architecture comprising loosley coupled layers;
+3-tier architecture comprising loosley coupled layers;
 Presentation or Web-Tier (webtier)
 Application-Tier (apptier)
 Database-Tier (dbtier)
 That achieves high scalability, availability, manageability and a secured architecture
+
+The project consist of a react frontend that is served by nginx(Web-Tier), a Nodejs backend (App-tier/App-logic) managed by pm2 and MYSQL database running on rds instance(Database_Tier)
 
 ...............................................................................
 STEPS
@@ -17,8 +19,8 @@ A. VPC and networking
 2. two public subnets across 2 AZs for Web-Tier(achieves high availability)
 3. two private subnets across 2 AZs for App-Tier (achieves high availability)
 4. two private subnets across 2 AZs for Database-Tier (achieves high availability)
-5. two internet gateway, route table and associations for the public subnets(Web-Tier)
-6. two elastic ips and nat gateway for each AZ with route tables and associations(App-Tier)
+5. two internet gateway2, route tables and associations for the public subnets(Web-Tier)
+6. two elastic ips and nat gateways for each AZ with route tables and associations(App-Tier)
 
 B. S3 Bucket and IAM Role Setup using terraform
 
@@ -31,7 +33,7 @@ C. Database-Tier Setup
  
 D. Setup App-Tier to Create AMI
 
-1. Launch ec2-instance within an App-tier subnet with created IAM role attached
+1. Launch ec2-instance within an App-tier subnet with the created IAM role attached
 2. Connect to the ec2-instance through ssm agent
 3. Run the commands below to install MYSQL on App-tier instance
 4. sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-1.noarch.rpm
@@ -42,7 +44,7 @@ D. Setup App-Tier to Create AMI
 and provide password to test connection between App-tier instance and and backend database
 
 
-E. Copy App-tier code from s3 bucket and assigned appropiate file permissions
+E. Pull App-tier code from s3 bucket and assign appropiate file permissions
 
 1. sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/app-tier app-tier --recursive
 2. sudo chown -R ec2-user:ec2-user /home/ec2-user/app-tier
@@ -59,11 +61,11 @@ E. Copy App-tier code from s3 bucket and assigned appropiate file permissions
 13. pm2 startup
 14. sudo env PATH=$PATH:/home/ec2-user/.nvm/versions/node/v16.20.2/bin /home/ec2-user/.nvm/versions/node/v16.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp
 15. pm2 save
-16. Create and save a custom AMI named App-tier AMI from the App-tier instance that has all the packages and app-tier applications installed.
+16. Create and save a custom AMI named App-tier AMI from the App-tier instance that has app-tier code installed on it.
 
 F. Setup Web-Tier to Create AIM
 
-1. Launch ec2-instance within a Web-tier subnet with created IAM role attached
+1. Launch ec2-instance within a Web-tier subnet with the created IAM role attached
 2. Connect to the ec2-instance through ssm agent
 3. Pull Web-tier code from s3 bucket and assign appropriate file permissions
 4. sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/web-tier web-tier --recursive
@@ -83,7 +85,7 @@ F. Setup Web-Tier to Create AIM
 18. sudo chmod -R 755 /home/ec2-user
 19. sudo service nginx restart
 20. sudo chkconfig nginx on
-21. Create and save a custom AMI named Web-tier AMI from the Web-tier instance that has all the packages and Web-tier applications installed.
+21. Create and save a custom AMI named Web-tier AMI from the Web-tier instance that has the Web-tier code installed.
 
 G. Provision, configure and deploy App-tier resources using terraform 
 
@@ -95,8 +97,7 @@ H. Provision, configure and deploy Web-tier resoruces using terraform
 
 I. Configure S3 backend to store terraform state and state locking
 
-J. Configured security groups (Database-Tier allows traffic only from a App-tier sg, App-Tier allows traffic only from internal load balancer(ILB) sg,
- ILB allows traffic only from Web-Tier Sg, Web-Tier allows traffic only from external LB)
+J. Configured security groups (Database-Tier sg allows traffic only from a App-tier sg id on port 3306, App-Tier sg allows traffic only from internal load balancer(ILB) sg id on port 4000, ILB sg allows traffic only from Web-Tier sg id on port 80, Web-Tier sg allows traffic only from external LB sg id on port 80, external LB allows traffic from anywhere on port 80)
  
 K. Monitoring resources using terraform 
 1. Vpc flow logs, external load balancer access and connection logs, 
