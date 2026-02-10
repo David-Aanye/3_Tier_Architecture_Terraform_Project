@@ -59,7 +59,7 @@ E. Copy App-tier code from s3 bucket and assigned appropiate file permissions
 13. pm2 startup
 14. sudo env PATH=$PATH:/home/ec2-user/.nvm/versions/node/v16.20.2/bin /home/ec2-user/.nvm/versions/node/v16.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp
 15. pm2 save
-16. Create and save AMI(App-tier AMI) of App-tier instance(aws console) that has all the packages and app-tier applications installed.
+16. Create and save a custom AMI named App-tier AMI from the App-tier instance that has all the packages and app-tier applications installed.
 
 F. Setup Web-Tier to Create AIM
 
@@ -83,7 +83,7 @@ F. Setup Web-Tier to Create AIM
 18. sudo chmod -R 755 /home/ec2-user
 19. sudo service nginx restart
 20. sudo chkconfig nginx on
-21. Create and save AMI named Web-tier AMI that has all the packages and Web-tier applications installed.
+21. Create and save a custom AMI named Web-tier AMI from the Web-tier instance that has all the packages and Web-tier applications installed.
 
 G. Provision, configure and deploy App-tier resources using terraform 
 
