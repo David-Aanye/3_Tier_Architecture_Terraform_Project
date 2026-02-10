@@ -86,10 +86,12 @@ F. Setup Web-Tier to Create AIM
 21. Create and save AMI named Web-tier AMI that has all the packages and Web-tier applications installed.
 
 G. Provision, configure and deploy App-tier resources using terraform 
-1. launch template using Web-tier AMI, internal load balancer, autoscaling group, sns topic and subscription
+
+1. launch template using the App-tier AMI, internal load balancer, autoscaling group, sns topic and subscription
+
 
 H. Provision, configure and deploy Web-tier resoruces using terraform
-1. launch template using AMI created after the Web-tier setup, external load balancer, autoscaling group, sns topic and subscription
+1. launch template using the Web-tier AMI, external load balancer, autoscaling group, sns topic and subscription
 
 I. Configure S3 backend to store terraform state and state locking
 
