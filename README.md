@@ -1,4 +1,4 @@
-# 3-TIER ARCHITECTURE PROJECT USING TERRAFORM DEPLOYED THROUGH CI/CD
+# 3-TIER ARCHITECTURE PROJECT USING TERRAFORM AND CI/CD
 ...........................................................
 
 3-tier architecture comprising loosley coupled layers;
