@@ -108,3 +108,8 @@ Use sudo yum install stress -y and stress -c $(nproc) to test the autoscaling gr
 Terraform configuration involving all resources used in this project are contained
 in .tf files 
 
+Configure .github/workflows/actions.yml & destroy.yml
+Push the configuration to github repo with these commands: git add ., git commit, and git push 
+
+Click on the Actions tap of the repo on github to automate the deployment 
+
