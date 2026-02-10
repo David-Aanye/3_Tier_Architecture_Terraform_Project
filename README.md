@@ -24,107 +24,77 @@ B. S3 Bucket and IAM Role Setup using terraform
 1. Provision S3 bucket and upload application code
 2. Create IAM role with SSMManagedInstance and AmazonS3ReadOnlyAccess to access the Applicaction ccode in s3 bucket
    
-8. Database-Tier Setup
--Database subnet group and rds instance provisioned, configured and deployed to serve as the backend database
+C. Database-Tier Setup
+1. Database subnet group and rds instance provisioned, configured and deployed to serve as the backend database
  
-9. Setup App-Tier to Create AMI
-Launch ec2-instance within an App-tier subnet with created IAM role attached
-Connect to the ec2-instance through ssm agent  
-Run the commands below to install MYSQL on App-tier instance
-
-sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-1.noarch.rpm
-sudo dnf install mysql80-community-release-el9-1.noarch.rpm -y
-sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
-sudo dnf install mysql-community-client -y
-
-Use this command: mysql -h <RDS-Endpoint> -u <databse-username> -p <press enter>
+D. Setup App-Tier to Create AMI
+1. Launch ec2-instance within an App-tier subnet with created IAM role attached
+2. Connect to the ec2-instance through ssm agent
+3. Run the commands below to install MYSQL on App-tier instance
+4. sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-1.noarch.rpm
+5. sudo dnf install mysql80-community-release-el9-1.noarch.rpm -y
+6. sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+7. sudo dnf install mysql-community-client -y
+  
+9. Use this command: mysql -h <RDS-Endpoint> -u <databse-username> -p <press enter>
 and provide password to test connection between App-tier instance and and backend database
 
-- Copy App-tier code from s3 bucket and assigned appropiate file permissions
-sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/app-tier app-tier --recursive
 
-cd app-tier
-sudo chown -R ec2-user:ec2-user /home/ec2-user/app-tier
-sudo chmod -R 755 /home/ec2-user/app-tier
+E. Copy App-tier code from s3 bucket and assigned appropiate file permissions
+1. sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/app-tier app-tier --recursive
+2. sudo chown -R ec2-user:ec2-user /home/ec2-user/app-tier
+3. sudo chmod -R 755 /home/ec2-user/app-tier
 
--Installing and starting NODEJS
+F. Installing and starting NODEJS
+1. curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+2. source ~/.bashrc
+3. nvm install 16
+4. nvm use 16
+5. npm install -g pm2
+6. npm install
+7. npm audit fix
+8. pm2 start index.js
+9. pm2 startup
+10. sudo env PATH=$PATH:/home/ec2-user/.nvm/versions/node/v16.20.2/bin /home/ec2-user/.nvm/versions/node/v16.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp
+11. pm2 save
+12. Create and save AMI(App-tier AMI) of App-tier instance(aws console) that has all the packages and app-tier applications installed.
 
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+G. Setup Web-Tier to Create AIM
+1. Launch ec2-instance within a Web-tier subnet with created IAM role attached
+2. Connect to the ec2-instance through ssm agent
+3. Pull Web-tier code from s3 bucket and assign appropriate file permissions
+4. sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/web-tier web-tier --recursive
+5. sudo chown -R ec2-user:ec2-user /home/ec2-user
+6. sudo chmod -R 755 /home/ec2-user
+7. Installing NODEJS(for using react application)
+8. curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+9. source ~/.bashrc
+10. nvm install 16
+11. nvm use 16
+12. npm install
+13. Building the Nginx for production(installing Nginx)
+14. sudo yum install nginx -y
+15. sudo mv nginx.conf nginx-backup.conf
+16. add the Internal-Load-Balancer-DNS in the nginx.conf file & upload it to S3
+17. sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/nginx.conf .
+18. sudo chmod -R 755 /home/ec2-user
+19. sudo service nginx restart
+20. sudo chkconfig nginx on
+21. Create and save AMI named Web-tier AMI that has all the packages and Web-tier applications installed.
 
-source ~/.bashrc
+H. Provision, configure and deploy App-tier resources using terraform 
+1. launch template using Web-tier AMI, internal load balancer, autoscaling group, sns topic and subscription
 
-nvm install 16
+I. Provision, configure and deploy Web-tier resoruces using terraform
+1. launch template using AMI created after the Web-tier setup, external load balancer, autoscaling group, sns topic and subscription
 
-nvm use 16
+J. Configure S3 backend to store terraform state and state locking
 
-npm install -g pm2
-
-npm install
-
-npm audit fix
-
-pm2 start index.js
-
-pm2 startup 
-
-sudo env PATH=$PATH:/home/ec2-user/.nvm/versions/node/v16.20.2/bin /home/ec2-user/.nvm/versions/node/v16.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp  
-
-pm2 save
-
-Create and save AMI(App-tier AMI) of App-tier instance(aws console) that has all the packages and app-tier applications installed.
-
-5.  Setup Web-Tier to Create AIM
-Launch ec2-instance within a Web-tier subnet with created IAM role attached
-
-Connect to the ec2-instance through ssm agent  
-
-Pull Web-tier code from s3 bucket and assign appropriate file permissions
-
-sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/web-tier web-tier --recursive
-
-sudo chown -R ec2-user:ec2-user /home/ec2-user
-
-sudo chmod -R 755 /home/ec2-user
-
-- Installing NODEJS(for using react application)
-- 
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-
-source ~/.bashrc
-
-nvm install 16
-
-nvm use 16
-
-cd /home/ec2-user/web-tier
-
-npm install
-
-- Building the Nginx for production(installing Nginx)
-  
-sudo yum install nginx -y	
-cd /etc/nginx
-sudo mv nginx.conf nginx-backup.conf
-add the Internal-Load-Balancer-DNS in the nginx.conf file & upload it to S3
-sudo aws s3 cp s3://<MY-S3-BUCKET-NAME>/application-code/nginx.conf . 
-sudo chmod -R 755 /home/ec2-user
-sudo service nginx restart
-sudo chkconfig nginx on
-
-Create and save AMI named Web-tier AMI that has all the packages and Web-tier applications installed.
-
-6. Provision, configure and deploy App-tier resources using terraform 
-launch template using Web-tier AMI, internal load balancer, autoscaling group, sns topic and subscription
-
-7. Provision, configure and deploy Web-tier resoruces using terraform
-launch template using AMI created after the Web-tier setup, external load balancer, autoscaling group, sns topic and subscription
-
-8. Configure S3 backend to store terraform state and state locking
-9. Configured security groups (Database-Tier allows traffic only from a App-tier sg, App-Tier allows traffic only from internal load balancer(ILB) sg,
+K. Configured security groups (Database-Tier allows traffic only from a App-tier sg, App-Tier allows traffic only from internal load balancer(ILB) sg,
  ILB allows traffic only from Web-Tier Sg, Web-Tier allows traffic only from external LB)
-)
-10. Monitoring resources using terraform 
-Vpc flow logs, external load balancer access and connection logs, 
+ 
+L. Monitoring resources using terraform 
+1. Vpc flow logs, external load balancer access and connection logs, 
 
 Use the external load balancer dns name to test the architecture
 Use sudo yum install stress -y and stress -c $(nproc) to test the autoscaling group after deployement
